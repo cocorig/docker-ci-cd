@@ -108,15 +108,15 @@
 4. `컨테이너 관리` <br>
    도커 엔진은 실행 중인 컨테이너의 상태를 모니터링하고 관리한다. 사용자는 도커 CLI를 통해 실행 중인 컨테이너를 조회하고, 로그를 확인하며, 필요한 경우 컨테이너를 중지, 재시작 또는 삭제할 수 있다.
 
-## Docker Compose
+## Docker Compose 개념
 
 - 예시
 
 ```yaml
-# docker 컨테이너 버전 명시
+# docker 컨테이너 버전 명시, 일반적으로 최신 버전을 사용하는 것이 좋다.
 version: "3"
 
-# services는 컨테이너
+# services는 애플리케이션을 구성하는 컨테이너들을 정의한다.각 서비스는 하나의 컨테이너를 의미.
 services:
   db:
     # 컨테이너 이름 설정
@@ -126,8 +126,12 @@ services:
     image:
     ports:
       -
+    # 볼륨는 데이터를 영구적으로 저장하기 위한 볼륨을 정의하고, 여러 컨테이너 간에 데이터를 공유할 수 있도록 한다.
     volumes:
       -
+    # 네트워크는 컨테이너 간 통신을 위한 네트워크를 정의한다.
+    networks:
+      app-network:
     # 환경 변수 설정
     environment:
       POSTGRES_USER:
@@ -135,11 +139,57 @@ services:
       POSTGRES_DB:
 ```
 
-Docker Compose는 다중 컨테이너 애플리케이션을 손쉽게 관리할 수 있는 도구로 여러 개의 컨테이너로 구성된 애플리케이션을 더 간편하게 구성하고 실행할 수 있다. 예를 들어 react와 PostgreSQL이 필요한 애플리케이션을 만들고자 한다면, 이 두 컨테이너를 하나의 YAML 파일에 서비스로 정의할 수 있다. <br>
+Docker Compose는 여러 컨테이너 애플리케이션을 손쉽게 관리할 수 있는 도구로 여러 개의 컨테이너로 구성된 애플리케이션을 더 간편하게 구성하고 실행할 수 있다. 예를 들어 react와 PostgreSQL이 필요한 애플리케이션을 만들고자 한다면, 이 두 컨테이너를 하나의 YAML 파일에 서비스로 정의할 수 있다. <br>
+YAML 파일은 파일 하나로 전체 애플리케이션 스택의 설정을 관리할 수 있고, 애플리케이션의 서비스, 네트워크, 볼륨 ,환경 변수 등으로 구성하며, 이 파일을 기반으로 한 명령어로 모든 서비스를 빌드하고 시작할 수 있다. 또한 개발, 테스팅, 스테이징, 프로덕션 환경에서의 일관성을 보장하는 데 유용하다!!
+[Try Docker Compose](https://docs.docker.com/compose/gettingstarted/)
+<br>
+
+### 정리
+
 [Compose 작성 템플릿 코드](https://github.com/docker/awesome-compose)
 
 ```bash
 docker compose up
+```
+
+```bash
+docker-compose down
+```
+
+## Volumes
+
+![Group 16](https://github.com/cocorig/docker-ci-cd/assets/95855640/ac661e1a-71d6-4a04-af3c-e2b924b6ef36)
+
+> 쉽게 보기위해 그린 이미지로 실제 동작과 다를 수 있습니다. 😅
+
+볼륨은 도커가 관리하는 데이터의 저장소이다. 주로 테스트 환경에서 데이터를 백업하고 필요할 때 복구하는 것이 용이하다.
+볼륨은 컨테이너와 `독립적으로 존재`하고 도커가 관리하기 때문에 데이터를 보관할 수 있고, 하나 이상의 컨테이너에서 사용할 수 있다. 또한 다른 여러 컨테이너 간에 `데이터를 공유`하거나 데이터의 지속적인 저장이 필요한 경우에 적합하기 때문에 이식성이 높다.
+주의할 점은 볼륨은 도커의 관리 하에 있기 때문에, 호스트 시스템의 파일 시스템 경로를 직접 지정할 수 없다.
+
+### Volumes 명령어
+
+- 새로운 볼륨을 생성한다.
+
+```bash
+docker volume create
+```
+
+- 생성된 볼륨 목록을 조회한다.
+
+```bash
+docker volume ls
+```
+
+- 지정한 볼륨을 삭제한다.
+
+```bash
+docker volume inspect
+```
+
+- 지정한 볼륨의 상세 정보를 조회한다.
+
+```bash
+docker-compose down
 ```
 
 ## Docker 기본 명령어
@@ -198,13 +248,13 @@ docker restart
 - 컨테이너 제거
 
 ```bash
-docker rm
+docker rm 컨테이너 이름
 ```
 
 - 이미지 제거(컨테이너 삭제 후 진행해야함)
 
 ```bash
-docker rmi
+docker rmi 이미지 이름
 ```
 
 - 이미지 빌드
@@ -212,6 +262,187 @@ docker rmi
 ```bash
 docker build
 ```
+
+<br>
+
+## 로컬 환경에서 Docker 실행
+
+```bash
+cd spring-docker-demo
+
+```
+
+```bash
+./mvnw clean package
+
+```
+
+```bash
+docker build -t spring-helloworld .
+
+```
+
+### -p 와 -d 옵션의 차이점
+
+```bash
+docker run -p 8080:8080 -t spring-helloworld
+
+```
+
+```bash
+docker run -d -p 8080:8080 -t spring-helloworld
+```
+
+- -d, --detach <br>
+  Run container in `background` and print container ID
+- -p, --publish <br>
+  Publish a container's port(s) to the host
+
+## DockerFile 작성하기
+
+Dockerfile은 `도커 이미지를 구축하기 위해` 명령어들을 순차적으로 나열한 텍스트 파일이다. 각각의 명령어는 이미지의 새로운 계층을 만들어 내며, 이러한 계층들이 합쳐져 최종적인 이미지를 형성한다. Dockerfile 작성의 기본 구조와 주요 명령어는 다음과 같다.
+
+- `FROM`: 모든 Dockerfile은 FROM 명령어로 시작해야 하며, 이는 빌드 과정의 기점이 되는 이미지를 정의한다.
+
+```DockerFile
+FROM ubuntu:18.04
+```
+
+- `LABEL`: 이미지에 메타데이터를 추가한다. 예를 들어, 이미지의 제작자 정보를 포함할 수 있다.
+
+```DockerFile
+LABEL maintainer="name@example.com"
+```
+
+- `RUN`: 이미지 빌드 과정 중에 명령어를 실행한다. 주로 패키지 설치나 설정 파일 변경에 사용된다.
+
+```DockerFile
+RUN apt-get update && apt-get install -y python
+```
+
+- `COPY`: 호스트의 파일이나 디렉토리를 이미지 내부로 복사한다. `애플리케이션의 소스 코드`를 이미지에 추가할 때 주로 사용된다.
+
+```DockerFile
+COPY . /app
+```
+
+- `ADD`: COPY 명령어와 유사하지만, 원격 URL에서 파일을 추가하거나 로컬의 압축 파일을 압축 해제하며 파일을 추가할 수 있다.
+
+```DockerFile
+ADD https://example.com/big.tar.xz /usr/src/things/
+```
+
+- `CMD`: 컨테이너가 시작될 때 실행할 기본 명령어를 정의한다. Dockerfile 내에서 한 번만 사용할 수 있다.
+
+```DockerFile
+CMD ["python", "./app/app.py"]
+```
+
+- `EXPOSE`:컨테이너가 리스닝할 포트를 지정한다. 네트워킹 구성에 도움을 준다.
+
+```DockerFile
+EXPOSE 80
+```
+
+- `ENV`: 환경 변수를 설정한다. 애플리케이션 설정에 사용된다.
+
+```DockerFile
+ENV API_KEY="YOUR_API_KEY"
+```
+
+- `WORKDIR`: RUN, CMD, ENTRYPOINT, COPY, ADD 명령어가 실행될 작업 디렉토리를 설정한다.
+
+```DockerFile
+WORKDIR /app
+```
+
+- `ENTRYPOINT`: 컨테이너가 시작될 때 실행할 기본 명령어를 정의한다. Dockerfile 내에서 한 번만 사용할 수 있다.
+
+```DockerFile
+ENTRYPOINT ["python"]
+CMD ["app.py"]
+```
+
+작성한 이후 `docker build 명령어`를 통해 이미지를 빌드할 수 있다. 이때 Dockerfile 내의 지시어들이 순서대로 실행되어 최종 이미지가 생성된다. Dockerfile을 활용함으로써 애플리케이션의 빌드와 배포 과정을 표준화하고 자동화할 수 있으며, 이는 개발의 효율성을 높이는 데 기여한다.
+
+## 도커 이미지 최적화 방법
+
+도커 이미지 크기를 줄이면 배포 시간을 단축시킬 수 있다.
+
+### 1. 경량 베이스 이미지 사용하기
+
+### 2. 멀티 스테이지 빌드 사용하기
+
+Dockerfile에서 `멀티 스테이지 빌드`를 사용하여 빌드 단계에만 필요한 도구를 최종 이미지에서 제외시킨다. 이 방식을 사용하면 최종 이미지에는 애플리케이션 실행에 필요한 파일과 디펜던시만 포함된다. 멀티 스테이지 빌드는 여러 개의 FROM 명령어를 사용하여 구현되며, 각 스테이지는 독립적인 베이스 이미지를 가질 수 있다. 첫 번째 스테이지에서는 빌드에 필요한 도구와 소스 코드를 컴파일하는 데 필요한 작업을 수행한다. 이후 스테이지에서는 첫 번째 스테이지에서 생성된 아티팩트만을 가져와서 최종 이미지를 생성한다. 이렇게 하면 불필요한 빌드 도구나 중간 생성물을 최종 이미지에서 제외할 수 있어 이미지 크기가 상당히 줄어든다.
+
+### 3. 필요 없는 파일 제거하기
+
+빌드 과정에서 생성되는 임시 파일, 캐시 파일 등 필요 없는 파일은 RUN 명령어에서 && rm -rf /path/to/temporary/files와 같이 제거하여 이미지 크기를 줄인다.
+
+### 4. 레이어 수 최소화하기
+
+UN, COPY, ADD 명령어는 새로운 레이어를 생성한다. 이러한 명령어를 적절히 조합하여 가능한 한 적은 수의 레이어를 생성하도록 Dockerfile을 최적화한다.
+
+### 5. COPY와 ADD 명령어를 신중하게 사용하기
+
+COPY와 ADD는 필요한 파일만 이미지에 추가하도록 사용한다. .dockerignore 파일을 사용하여 불필요한 파일이 이미지에 포함되지 않도록 설정할 수 있다.
+
+### 6. 환경 변수를 이용한 설정하기
+
+가능한 설정 파일 대신 환경 변수를 사용하여 애플리케이션을 구성한다. 이 방법은 설정 변경이 필요할 때 이미지를 다시 빌드하지 않아도 되므로 이미지 크기를 줄이는 데 도움이 된다.
+
+### 7. 적절한 태그 사용하기
+
+## 호스트 간 파일 복사하기
+
+`docker cp` 는 실행 중인 도커 컨테이너와 호스트 사이에서 파일이나 디렉토리를 복사하는 데 사용된다. 이 명령어는 컨테이너의 파일 시스템과 호스트의 파일 시스템 간의 데이터를 쉽게 이동할 수 있게 해준다. 또한 로그 파일, 설정 파일, 애플리케이션의 데이터 등 컨테이너 내부나 외부에서 필요한 데이터를 쉽게 이동시키는 데 유용하다. 그러나, 컨테이너의 실행 중인 서비스에 필수적인 파일을 변경하거나 삭제할 때는 주의가 필요하다.
+
+- [container/cp](https://docs.docker.com/reference/cli/docker/container/cp/)
+- [How to copy files from host to Docker container?](https://stackoverflow.com/questions/22907231/how-to-copy-files-from-host-to-docker-container/54970242#54970242)
+
+### 기본 구조
+
+- 호스트에서 컨테이너로 파일이나 디렉토리 복사하기
+
+```bash
+docker cp <호스트의 파일 경로> <컨테이너 이름>:<컨테이너 내 경로>
+```
+
+예를 들어, 호스트의 myfile.txt를 mycontainer라는 이름의 컨테이너의 /usr/src/app 디렉토리로 복사하고 싶다면, 다음과 같이 실행한다
+
+```bash
+docker cp myfile.txt mycontainer:/usr/src/app/myfile.txt
+```
+
+컨테이너에서 호스트로 파일이나 디렉토리 복사하기
+
+```bash
+docker cp <컨테이너 이름>:<컨테이너 내 파일 경로> <호스트의 경로>
+```
+
+예를 들어, mycontainer 컨테이너의 /usr/src/app/myfile.txt를 호스트의 현재 작업 디렉토리로 복사하고 싶다면, 다음과 같이 실행한다.
+
+```bash
+docker cp mycontainer:/usr/src/app/myfile.txt ./myfile.txt
+
+```
+
+## Network
+
+컨테이너와 컨테이너를 따로 따로 만들면 그냥 연결이 될까?? no!
+가상 네트워크를 만들어서 이 네트워크에 컨테이너를 소속시켜 컨테이너들을 연결해야 한다.
+
+### Docker network 의 종류
+
+### 브리지 네트워크 (Bridge Network)
+
+<img width="628" alt="스크린샷 2024-04-05 오후 11 13 56" src="https://github.com/cocorig/docker-ci-cd/assets/95855640/15160bd8-7a01-4835-b576-c7521cd38a57">
+<img width="691" alt="스크린샷 2024-04-05 오후 11 14 05" src="https://github.com/cocorig/docker-ci-cd/assets/95855640/6181668c-3d3f-479f-b85b-ae794de92f9b">
+
+기본적으로, 각 도커 설치에는 `하나의 브리지 네트워크`가 존재하며, 컨테이너를 실행할 때 이 네트워크에 `자동`으로 연결된다. 사용자는 여러 개의 사용자 정의 브리지 네트워크를 생성하여 컨테이너를 논리적으로 `분리`할 수 있다.
+같은 브리지 네트워크에 속한 컨테이너끼리는 서로 통신할 수 있지만, `다른 브리지 네트워크에 속한 컨테이너와는 통신할 수 없다`. 이를 통해 애플리케이션의 컴포넌트를 `격리`할 수 있다
+`브릿지 네트워크`는 도커 컨테이너들이 `동일한 호스트 내에서` 서로 통신할 수 있도록 하는 기본 네트워크 타입 중 하나다.
+이 네트워크는 `가상의 브릿지(bridge)`를 통해 각 컨테이너를 연결하며, 이를 통해 컨테이너 간에 데이터를 주고받을 수 있다. 브릿지 네트워크는 컨테이너가 생성될 때 자동으로 생성되는 기본 네트워크(bridge)와 사용자가 직접 생성할 수 있는 사용자 정의 브릿지 네트워크로 구분할 수 있다.
 
 ## reference
 
