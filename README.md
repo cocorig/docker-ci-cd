@@ -488,7 +488,7 @@ CI/CD 파이프라인의 도입은 개발 프로세스의 자동화뿐만 아니
 ### GitHub Actions
 
 장점: GitHub과의 긴밀한 통합
-단점: 다른 도구들에 비해 상대적으로 새로움
+단점: 다른 도구들에 비해 상대적으로 새로움 <br>
 [GitHub Actions 공식 문서](https://docs.github.com/en/actions)
 📌 [GitHub Actions 가이드](https://docs.github.com/ko/actions/guides)
 GitHub 리포지토리를 사용할 때 GitHub Actions가 유리한 이유는 리포지토리와의 긴밀한 통합 때문이다. 소스 코드 관리와 CI/CD 파이프라인을 같은 플랫폼에서 관리할 수 있어, 복잡성이 줄어들고 프로젝트의 효율성이 증가한다.
@@ -514,29 +514,27 @@ GitHub 리포지토리를 사용할 때 GitHub Actions가 유리한 이유는 �
 ## 실습
 
 ```yaml
-name: learn-github-actions
+name: learn-github-actions # 워크플로우의 이름
 run-name: ${{ github.actor }} is learning GitHub Actions
-on: [push]
-jobs:
-  check-bats-version:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+on: [push] # 푸시 이벤트 트리거
+
+jobs: # 실행되는 모든 작업을 그룹화
+  check-bats-version: # Actions 이름으로, 작업의 속성을 정의함
+    runs-on: ubuntu-latest # Actions이 실행되는 운영체제 및 버전
+    steps: # 실행되는 모든 단계를 그룹
+      - uses: actions/checkout@v4 # GitHub 저장소를 체크아웃
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "20" # 사용할 Node.js 버전
       - run: npm install -g bats
       - run: bats -v
 ```
-
-- `name: learn-github-actions` :`[option]` GitHub 저장소의 "Actions" 탭에 표시되는 워크플로우 이름
-- `run-name: ${{ github.actor }} is learning GitHub Actions` :`[option]`
 
 ## reference
 
 - 원티드 프리온보딩 과정
 - [github docs](https://docs.github.com/ko/actions/learn-github-actions/understanding-github-actions)
-- 이미지 출처 : docker 공식문서,github 공식문서 geeksforgeeks
 - [docker.docs](https://docs.docker.com/guides/walkthroughs/run-a-container/#step-3-build-your-first-image)
 - [CLI Cheat Sheet](https://docs.docker.com/get-started/docker_cheatsheet.pdf)
 - [Docker CLI 기본 명령어](https://docs.docker.com/reference/cli/docker/)
+- 이미지 출처 : docker 공식문서,github 공식문서 geeksforgeeks
