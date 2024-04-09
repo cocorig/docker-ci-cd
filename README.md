@@ -444,11 +444,99 @@ docker cp mycontainer:/usr/src/app/myfile.txt ./myfile.txt
 `브릿지 네트워크`는 도커 컨테이너들이 `동일한 호스트 내에서` 서로 통신할 수 있도록 하는 기본 네트워크 타입 중 하나다.
 이 네트워크는 `가상의 브릿지(bridge)`를 통해 각 컨테이너를 연결하며, 이를 통해 컨테이너 간에 데이터를 주고받을 수 있다. 브릿지 네트워크는 컨테이너가 생성될 때 자동으로 생성되는 기본 네트워크(bridge)와 사용자가 직접 생성할 수 있는 사용자 정의 브릿지 네트워크로 구분할 수 있다.
 
+  <br>
+  
+# CI / CD 기초 개념과 아키텍쳐
+
+<img width="623" alt="스크린샷 2024-04-09 오후 8 42 25" src="https://github.com/cocorig/docker-ci-cd/assets/95855640/58bc4b08-37d4-4443-8492-4446eb22b8f7">
+
+<img width="534" alt="스크린샷 2024-04-09 오후 8 44 00" src="https://github.com/cocorig/docker-ci-cd/assets/95855640/c0ae8c9b-1f1b-4c13-ad5d-1e5352aecd3d">
+
+CI/CD는 소프트웨어 개발 과정에서의 효율성과 신속성을 극대화하는 자동화된 프레임워크를 제공한다. 이 접근 방식은 개발부터 운영까지의 소프트웨어 개발 라이프사이클의 모든 단계를 아우르며, `지속적 통합`, `지속적 전달`, `지속적 배포`의 세 주요 구성 요소로 구분된다.
+
+## 지속적 통합 (CI)
+
+개발자들이 작업한 코드를 주기적으로 `공유 레포지토리에 병합함`으로써, 코드의 통합을 자동화하는 과정이다.
+모든 변경사항은 `자동 빌드` 및 `테스트`를 거쳐 메인 브랜치에 통합된다.
+코드 충돌을 최소화하며, 소프트웨어의 품질을 유지하고, `배포 준비 상태`를 지속적으로 유지할 수 있다.
+
+## 지속적 전달 (CD - Continuous Delivery)
+
+CI 과정을 한 단계 더 발전시켜, 코드 변경사항이 자동으로 빌드 및 테스트를 거쳐 실제 운영 환경에 `배포될 준비`가 된다.
+이 단계에서는 배포 과정을 완전히 자동화하지 않고, 실제 배포는 수동으로 트리거할 수 있는 옵션을 둔다.
+개발팀은 언제든지 안정적인 버전의 소프트웨어를 신속하게 배포할 준비가 되어 있으며, 비즈니스 요구에 따라 배포 시점을 선택할 수 있다.
+
+## 지속적 배포 (CD - Continuous Deployment)
+
+모든 코드 변경사항이 자동 테스트를 통과하면 즉시 프로덕션 환경에 배포된다.
+
+이 과정은 개발팀이 소프트웨어를 빠르게 혁신하고, 사용자에게 지속적으로 가치를 전달할 수 있도록 한다.
+
+지속적 배포를 통해, 소프트웨어의 `릴리스 과정이 자동화`되어, 인간의 개입 없이도 신속하게 배포된다. 개발환경 설정까지 자동화된다.
+
+CI/CD 파이프라인의 도입은 개발 프로세스의 자동화뿐만 아니라, 코드 통합, 테스트, 배포 과정의 효율성을 극대화하여, 개발팀이 더 나은 소프트웨어를 더 빠르게 출시할 수 있도록 지원한다. 각 단계에서의 자동화와 통합은 코드 품질의 지속적인 개선, 개발 주기의 단축, 그리고 최종적으로는 사용자 만족도의 증대로 이어진다. CI/CD는 현대적인 소프트웨어 개발의 필수 요소로, 지속적인 혁신과 경쟁력 유지를 위한 핵심 전략이다.
+<br>
+
+## CI/ CD 주요 파이프라인 도구들
+
+### Jenkins
+
+장점: 매우 유연하며, 수많은 플러그인으로 확장 가능
+단점: 초기 설정이 복잡할 수 있음
+[Jenkins 공식 문서](https://www.jenkins.io/doc/)
+
+### GitHub Actions
+
+장점: GitHub과의 긴밀한 통합
+단점: 다른 도구들에 비해 상대적으로 새로움
+[GitHub Actions 공식 문서](https://docs.github.com/en/actions)
+📌 [GitHub Actions 가이드](https://docs.github.com/ko/actions/guides)
+GitHub 리포지토리를 사용할 때 GitHub Actions가 유리한 이유는 리포지토리와의 긴밀한 통합 때문이다. 소스 코드 관리와 CI/CD 파이프라인을 같은 플랫폼에서 관리할 수 있어, 복잡성이 줄어들고 프로젝트의 효율성이 증가한다.
+
+### GitLab CI/CD
+
+장점: 소스 코드 관리와 CI/CD가 하나의 플랫폼에 통합
+단점: 대규모 프로젝트에서는 자원 관리가 필요할 수 있음
+[GitLab CI/CD 공식 문서](https://docs.gitlab.com/ee/ci/)
+
+### CircleCI
+
+장점: 빠른 실행 속도와 좋은 확장성
+단점: 무료 플
+[CircleCI 공식 문서](https://circleci.com/docs/)
+
+## Github Action 의 동작원리
+
+<img width="618" alt="스크린샷 2024-04-09 오후 8 45 20" src="https://github.com/cocorig/docker-ci-cd/assets/95855640/0910dbe3-67dd-4a2a-aaf9-ba8e87df9851">
+
+`리포지토리의 이벤트(푸시, 풀 리퀘스트)` 에 반응하여 자동화된 워크플로우를 실행하는 시스템으로 워크플로우는 github/workflows 디렉토리 내 `YAML 파일로 정의`되며, 이 파일 내에서 작업(jobs), 단계(steps), 액션(actions) 등을 설정할 수 있다.
+
+## 실습
+
+```yaml
+name: learn-github-actions
+run-name: ${{ github.actor }} is learning GitHub Actions
+on: [push]
+jobs:
+  check-bats-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install -g bats
+      - run: bats -v
+```
+
+- `name: learn-github-actions` :`[option]` GitHub 저장소의 "Actions" 탭에 표시되는 워크플로우 이름
+- `run-name: ${{ github.actor }} is learning GitHub Actions` :`[option]`
+
 ## reference
 
 - 원티드 프리온보딩 과정
-- 이미지 출처 : docker공식문서, geeksforgeeks
+- [github docs](https://docs.github.com/ko/actions/learn-github-actions/understanding-github-actions)
+- 이미지 출처 : docker 공식문서,github 공식문서 geeksforgeeks
 - [docker.docs](https://docs.docker.com/guides/walkthroughs/run-a-container/#step-3-build-your-first-image)
 - [CLI Cheat Sheet](https://docs.docker.com/get-started/docker_cheatsheet.pdf)
 - [Docker CLI 기본 명령어](https://docs.docker.com/reference/cli/docker/)
-  <br>
